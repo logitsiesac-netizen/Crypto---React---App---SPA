@@ -1,0 +1,9 @@
+Dependencias
+/node_modules
+/package-lock.json
+
+Build files
+/build
+/dist
+.env.local
+.DS_Store
