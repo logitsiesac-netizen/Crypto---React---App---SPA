@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom'; // Necesario para el componente Tour
+import { createPortal } from 'react-dom';
 
 // =================================================================
 // 1. COMPONENTES SVG E ÍCONOS
@@ -111,7 +111,8 @@ const fetchWithRetry = async (url, retries = 3, initialDelay = 1000) => {
       if (i === retries - 1) {
         throw err;
       }
-      console.warn(`Error fetching data, retrying in ${delay}ms...`);
+      // Aplicar reintento con retroceso exponencial para manejar errores de red o límites de tasa.
+      console.warn(`Error al obtener datos, reintentando en ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       delay *= 2;
     }
@@ -119,38 +120,37 @@ const fetchWithRetry = async (url, retries = 3, initialDelay = 1000) => {
   throw new Error("Failed to fetch data after all retries.");
 };
 
-// Simulación para la detección del entorno Tauri
 const isTauriEnvironment = window.__TAURI__ !== undefined;
 
 // =================================================================
-// 3. DATOS Y COMPONENTE DEL TOUR INTERACTIVO (Punto 5)
+// 3. DATOS Y COMPONENTE DEL TOUR INTERACTIVO
 // =================================================================
 
 const tourSteps = [
   {
     selector: '#app-header',
-    title: 'Bienvenido a la Crypto App',
-    content: 'Este es el encabezado. Aquí puedes cambiar el tema, la accesibilidad y reiniciar el tour.',
+    title: '¡Bienvenido a la Crypto App!',
+    content: 'Este es el panel superior de control. Aquí puedes alternar el tema (claro/oscuro), activar el alto contraste y reiniciar esta guía.',
   },
   {
     selector: '#search-input',
-    title: 'Búsqueda Rápida',
-    content: 'Usa este campo para filtrar rápidamente las criptomonedas por nombre o símbolo.',
+    title: 'Filtra tus Monedas',
+    content: 'Escribe aquí el nombre o el símbolo de la criptomoneda que buscas (ej: BTC, Ethereum). La lista se actualiza automáticamente.',
   },
   {
     selector: '#sort-select',
-    title: 'Opciones de Ordenamiento',
-    content: 'Selecciona cómo quieres ordenar la lista: por precio, capitalización o nombre.',
+    title: 'Define el Orden',
+    content: 'Utiliza esta opción para ordenar la lista de criptomonedas según tus preferencias: por precio, ranking de capitalización o nombre.',
   },
   {
     selector: '#export-button',
-    title: 'Exportación de Datos',
-    content: 'Si usas la versión de escritorio (Tauri), puedes exportar la lista filtrada a un archivo local.',
+    title: 'Función de Exportación',
+    content: 'Si estuvieras utilizando la versión de escritorio de esta aplicación (Tauri), podrías exportar el listado actual a un archivo local de forma segura.',
   },
   {
     selector: '.crypto-grid',
-    title: 'Datos en Tiempo Real',
-    content: 'Aquí verás el listado de las 100 principales criptomonedas y sus métricas clave.',
+    title: 'Mercado en Vivo',
+    content: 'Aquí tienes un vistazo de las 100 principales criptomonedas, con datos en tiempo real como precio, rank y variación de 24 horas.',
   },
 ];
 
@@ -163,7 +163,7 @@ const TourPopover = ({ step, onNext, onSkip, isLast }) => {
   const rect = targetElement.getBoundingClientRect();
   const popoverWidth = 300; 
   
-  // Posicionamiento (lo colocamos a la derecha del elemento si es posible, o debajo si está muy a la izquierda)
+  // Posicionamiento
   let leftPos = rect.right + window.scrollX + 10;
   let topPos = rect.top + window.scrollY;
 
@@ -183,8 +183,9 @@ const TourPopover = ({ step, onNext, onSkip, isLast }) => {
   };
 
   return createPortal(
+    // Aumentamos el z-index a 9999 para asegurar que esté por encima de cualquier otro elemento pegajoso (sticky) como el encabezado.
     <div
-      className="fixed z-[1000] p-4 max-w-sm bg-white border border-gray-200 rounded-xl shadow-2xl transition-opacity duration-300 dark:bg-gray-700 dark:border-gray-600"
+      className="fixed z-[9999] p-4 max-w-sm bg-white border border-gray-200 rounded-xl shadow-2xl transition-opacity duration-300 dark:bg-gray-700 dark:border-gray-600"
       style={style}
       role="dialog"
       aria-modal="true"
@@ -256,8 +257,8 @@ const TourComponent = ({ onFinish }) => {
     document.querySelectorAll('[data-tour-highlighted="true"]').forEach(el => {
       el.style.outline = '';
       el.style.outlineOffset = '';
-      el.removeAttribute('data-tour-highlighted');
       el.style.zIndex = '';
+      el.removeAttribute('data-tour-highlighted');
     });
 
     // Resaltar y hacer scroll al elemento actual
@@ -266,7 +267,7 @@ const TourComponent = ({ onFinish }) => {
       element.style.outline = '4px solid #f97316'; // Naranja brillante
       element.style.outlineOffset = '4px';
       element.style.transition = 'outline 0.3s ease, outline-offset 0.3s ease';
-      element.style.zIndex = '999'; // Asegura que el elemento resaltado esté sobre el overlay
+      element.style.zIndex = '9998'; // Un z-index alto, pero menor que el popover (9999)
       element.setAttribute('data-tour-highlighted', 'true');
     }
     
@@ -284,17 +285,17 @@ const TourComponent = ({ onFinish }) => {
 
   return (
     <>
-      {/* Overlay oscuro */}
+      {/* Overlay oscuro (z-index 9990) */}
       {createPortal(
         <div 
-          className="fixed inset-0 bg-gray-900 bg-opacity-70 z-[900] transition-opacity duration-300" 
+          className="fixed inset-0 bg-gray-900 bg-opacity-70 z-[9990] transition-opacity duration-300" 
           onClick={handleSkip}
           aria-hidden="true" 
         ></div>,
         document.body
       )}
       
-      {/* Popover del paso actual */}
+      {/* Popover del paso actual (z-index 9999) */}
       <TourPopover
         step={tourSteps[currentStep]}
         onNext={handleNext}
@@ -307,11 +308,11 @@ const TourComponent = ({ onFinish }) => {
 
 
 // =================================================================
-// 4. ESTILOS GLOBALES (Incluyendo tu CSS y el Alto Contraste)
+// 4. ESTILOS GLOBALES
 // =================================================================
 
 const globalStyles = `
-  /* Variables de Color (Originales) */
+  /* Variables de Color */
   :root {
     --bg-light: #ffffff;
     --text-light: #2d3748;
@@ -336,17 +337,16 @@ const globalStyles = `
     --negative-color: #fc8181;
   }
   
-  /* --- ESTILOS DE ALTO CONTRASTE (Punto 6) --- */
+  /* --- ESTILOS DE ALTO CONTRASTE --- */
   .high-contrast {
-    /* Fondo y texto base, usando colores de alta visibilidad */
     --bg-light: black !important;
-    --text-light: #ccff00 !important; /* Verde Neón */
+    --text-light: #ccff00 !important; /* Neón Green */
     --header-bg-light: #111 !important;
     --card-bg-light: #333 !important;
     --border-light: #ccff00 !important;
     --accent-color: #ccff00 !important;
-    --positive-color: #00ff00 !important; /* Verde puro */
-    --negative-color: #ff0000 !important; /* Rojo puro */
+    --positive-color: #00ff00 !important;
+    --negative-color: #ff0000 !important;
     --contrast-text: black;
     --contrast-bg: #ccff00;
   }
@@ -356,17 +356,15 @@ const globalStyles = `
     box-shadow: 0 0 10px var(--border-light) !important;
   }
   
-  /* Estilos para asegurar el contraste de elementos */
   .high-contrast .input-field, 
   .high-contrast .select-field,
   .high-contrast .crypto-card {
     border: 2px solid var(--border-light) !important;
     background-color: var(--card-bg-light) !important;
     color: var(--text-light) !important;
-    box-shadow: 0 0 5px rgba(204, 255, 0, 0.5) !important; /* Sombra neón */
+    box-shadow: 0 0 5px rgba(204, 255, 0, 0.5) !important;
   }
 
-  /* Ajuste de colores en texto */
   .high-contrast h1, 
   .high-contrast h2, 
   .high-contrast h3, 
@@ -382,7 +380,7 @@ const globalStyles = `
   }
 
 
-  /* Estilos Generales (Tus originales) */
+  /* Estilos Generales */
   .app-container {
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -434,7 +432,6 @@ const globalStyles = `
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 
-  /* ... El resto de tus estilos ... */
   
   .main-content { padding: 24px; }
   .controls-grid { 
@@ -573,28 +570,27 @@ const App = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [systemMessage, setSystemMessage] = useState(null);
 
-  // Estado del Tema (Oscuro/Claro) - Tu código original
   const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Cargar la preferencia de tema desde localStorage
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       return storedTheme === 'dark';
     }
+    // O usar la preferencia del sistema
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Nuevo estado para el Modo Alto Contraste (Punto 6)
   const [isHighContrast, setIsHighContrast] = useState(
     () => localStorage.getItem('highContrast') === 'true'
   );
   
-  // Nuevo estado para el Tour Interactivo (Punto 5)
   const [showTour, setShowTour] = useState(false);
 
 
   // --- Efectos de Estado ---
 
-  // Efecto para el Tema Oscuro/Claro
   useEffect(() => {
+    // Aplicar clase para el tema oscuro
     const root = document.documentElement;
     if (isDarkMode) {
       root.classList.add('dark');
@@ -605,8 +601,8 @@ const App = () => {
     }
   }, [isDarkMode]);
   
-  // Efecto para el Modo Alto Contraste
   useEffect(() => {
+    // Aplicar clase para el alto contraste
     if (isHighContrast) {
       document.documentElement.classList.add('high-contrast');
     } else {
@@ -615,27 +611,28 @@ const App = () => {
     localStorage.setItem('highContrast', isHighContrast);
   }, [isHighContrast]);
 
-  // Efecto para la carga inicial del Tour
   useEffect(() => {
+    // Verificar si el tour ya fue completado
     const tourCompleted = localStorage.getItem('tourCompleted');
     if (tourCompleted !== 'true') {
+      // Mostrar el tour después de un breve retraso
       const timer = setTimeout(() => setShowTour(true), 1500); 
       return () => clearTimeout(timer);
     }
   }, []);
 
-  // Función para la API (Tu código original)
   useEffect(() => {
     setLoading(true);
     const apiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false';
     
+    // Usar la función con retroceso para la obtención de datos robusta
     fetchWithRetry(apiUrl)
       .then(data => {
         setCoins(data);
         setLoading(false);
       })
       .catch(err => {
-        console.error("Error fetching cryptocurrency data:", err);
+        console.error("Error al obtener datos de criptomonedas:", err);
         setError("Error al cargar los datos. Intente recargar.");
         setLoading(false);
       });
@@ -644,16 +641,16 @@ const App = () => {
 
   // --- Funciones de Lógica de la Aplicación ---
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setIsDarkMode(prevMode => !prevMode);
-  };
+  }, []);
   
-  const toggleHighContrast = () => {
+  const toggleHighContrast = useCallback(() => {
     setIsHighContrast(prev => !prev);
-  };
+  }, []);
   
   const handleTourFinish = useCallback(() => {
-    // Limpiar resaltados al finalizar el tour
+    // Limpiar elementos resaltados al finalizar el tour
     document.querySelectorAll('[data-tour-highlighted="true"]').forEach(el => {
       el.style.outline = '';
       el.style.outlineOffset = '';
@@ -670,6 +667,7 @@ const App = () => {
   }, [showTour]);
   
   const handleExportData = async () => {
+    // Esta función solo está disponible en el entorno de escritorio Tauri simulado
     if (!isTauriEnvironment) {
       setSystemMessage({ 
         message: "Esta función de exportación requiere la aplicación de escritorio (Tauri).",
@@ -693,20 +691,23 @@ const App = () => {
   };
 
 
-  // --- Lógica de Filtro y Ordenamiento (Tu código original) ---
+  // --- Lógica de Filtro y Ordenamiento ---
   const filteredAndSortedCoins = useMemo(() => {
     let result = [...coins];
 
     if (search) {
       const lowerCaseSearch = search.toLowerCase();
+      // Filtrar por nombre o símbolo
       result = result.filter(coin => 
         coin.name.toLowerCase().includes(lowerCaseSearch) || 
         coin.symbol.toLowerCase().includes(lowerCaseSearch)
       );
     }
 
+    // Ordenar los resultados
     result.sort((a, b) => {
       let comparison = 0;
+      // Usar -Infinity para asegurar que los nulos o indefinidos se muevan al final en orden ascendente
       const valA = a[sortKey] ?? (sortKey === 'name' ? '' : -Infinity);
       const valB = b[sortKey] ?? (sortKey === 'name' ? '' : -Infinity);
 
@@ -722,21 +723,20 @@ const App = () => {
   }, [coins, search, sortKey, sortOrder]);
 
 
-  // --- Atajos de Teclado Globales (Punto 6) ---
+  // --- Atajos de Teclado Globales ---
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Usamos Ctrl o Cmd (metaKey) para los atajos de teclado
       if (event.ctrlKey || event.metaKey) {
         switch (event.key.toLowerCase()) {
-          case 't': // Ctrl+T para Tour
+          case 't': // Ctrl + T para iniciar el Tour
             event.preventDefault();
             startTour();
             break;
-          case 'a': // Ctrl+A para Accesibilidad (Alto Contraste)
+          case 'a': // Ctrl + A para Alto Contraste
             event.preventDefault();
             toggleHighContrast();
             break;
-          case 'd': // Ctrl+D para Tema (Dark/Light)
+          case 'd': // Ctrl + D para Tema Oscuro
             event.preventDefault();
             toggleTheme();
             break;
@@ -753,11 +753,12 @@ const App = () => {
 
   return (
     <>
+      {/* Inyectar estilos globales */}
       <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
 
       <div className="app-container">
         
-        {/* Encabezado con ID para el Tour */}
+        {/* Encabezado */}
         <header id="app-header" className="app-header">
           <h1 className="app-title">
             Criptomonedas
@@ -765,7 +766,7 @@ const App = () => {
           
           <div className="flex items-center space-x-4">
             
-            {/* Botón Alto Contraste (Punto 6) */}
+            {/* Botón Alto Contraste */}
             <button
               onClick={toggleHighContrast}
               className="header-action-button contrast-button"
@@ -778,12 +779,12 @@ const App = () => {
               Alto Contraste (Ctrl+A)
             </button>
             
-            {/* Botón Iniciar Tour (Punto 5) */}
+            {/* Botón Iniciar Tour */}
             <button
               onClick={startTour}
               className="header-action-button"
               style={{
-                  backgroundColor: '#f97316', // Naranja
+                  backgroundColor: '#f97316',
                   color: 'white',
               }}
               aria-label="Iniciar guía interactiva (Atajo: Ctrl + T)"
@@ -791,7 +792,7 @@ const App = () => {
               Iniciar Tour (Ctrl+T)
             </button>
 
-            {/* Botón Tema Oscuro/Claro (Tu código original) */}
+            {/* Botón Tema Oscuro/Claro */}
             <button
               onClick={toggleTheme}
               className="header-action-button"
@@ -813,7 +814,7 @@ const App = () => {
           <div className="controls-grid">
             
             <input
-              id="search-input" // ID para el Tour
+              id="search-input"
               type="text"
               placeholder="Buscar por nombre o símbolo..."
               value={search}
@@ -823,7 +824,7 @@ const App = () => {
             />
             
             <select
-              id="sort-select" // ID para el Tour
+              id="sort-select"
               value={`${sortKey}-${sortOrder}`}
               onChange={(e) => {
                 const [key, order] = e.target.value.split('-');
@@ -844,7 +845,7 @@ const App = () => {
 
           <div>
             <button
-              id="export-button" // ID para el Tour
+              id="export-button"
               onClick={handleExportData}
               disabled={!isTauriEnvironment} 
               className={`header-action-button`} 
@@ -886,7 +887,7 @@ const App = () => {
             </div>
           )}
 
-          <div id="main-content" className="crypto-grid"> {/* ID para el Tour */}
+          <div id="main-content" className="crypto-grid">
             {filteredAndSortedCoins.map(coin => (
               <div 
                 key={coin.id} 
@@ -938,3 +939,4 @@ const App = () => {
 };
 
 export default App;
+
