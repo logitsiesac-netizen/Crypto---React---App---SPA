@@ -1,70 +1,41 @@
-# Getting Started with Create React App
+Crypto - React - Chakra UI - Tauri 
+Este proyecto es una aplicación web sencilla desarrollada con React para el seguimiento en tiempo real de criptomonedas, utilizando la API de CoinGecko.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Características Principales
+Consumo de API: Obtiene y muestra datos de las 100 principales criptomonedas del mercado (precio, capitalización, cambio 24h).
 
-## Available Scripts
+Filtrado y Búsqueda: Permite buscar monedas por nombre o símbolo.
 
-In the project directory, you can run:
+Ordenamiento: Los resultados pueden ser ordenados por Capitalización de Mercado, Precio o Nombre.
 
-### `npm start`
+Estilo Moderno: La interfaz utiliza Chakra UI para un diseño limpio, responsivo y profesional.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Modo Oscuro/Claro: Implementación de un interruptor de tema para mejorar la accesibilidad y la experiencia del usuario.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Compatibilidad con Tauri (opcional): La estructura del código incluye lógica para detectar si la aplicación se ejecuta como una aplicación de escritorio (Tauri) para habilitar funcionalidades locales, como guardar la lista de criptos en un archivo.
 
-### `npm test`
+Tecnologías Utilizadas
+Frontend: React (usando create-react-app).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Estilos: Chakra UI.
 
-### `npm run build`
+API: CoinGecko.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Entorno de Escritorio (Opcional): Tauri (la configuración no está incluida, pero la lógica de guardado sí).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+🛠️ Instalación y Ejecución Local
+Para ejecutar el proyecto en tu máquina local:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Instala dependencias:
 
-### `npm run eject`
+npm install
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Inicia la aplicación:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+npm start
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+La aplicación se abrirá automáticamente en tu navegador por defecto en http://localhost:3000.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Nota Importante para la Evaluación:
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Para la correcta evaluación, asegúrese de que el archivo README.md y LICENSE.md se encuentren en la raíz de la carpeta del proyecto (mi-spa).
