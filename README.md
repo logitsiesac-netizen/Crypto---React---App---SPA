@@ -35,7 +35,3 @@ Inicia la aplicación:
 npm start
 
 La aplicación se abrirá automáticamente en tu navegador por defecto en http://localhost:3000.
-
-Nota Importante para la Evaluación:
-
-Para la correcta evaluación, asegúrese de que el archivo README.md y LICENSE.md se encuentren en la raíz de la carpeta del proyecto (mi-spa).
